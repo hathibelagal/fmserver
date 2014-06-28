@@ -1,3 +1,8 @@
+// Author: Hathibelagal
+// FM Server
+
+// This is a simple HTTP server that can handle GET requests, and serve
+// static files from a directory
 package main
 
 import (
@@ -81,13 +86,13 @@ func serve(request string) []byte {
     filename := parts[1]
 
     // If it is a root request, try to server index.html
-    if (filename == "/") {
-        filename = "/index.html"
+    if (strings.HasSuffix(filename, "/")) {
+        filename = filename+ "/index.html"
     }
     
     filename = props.directory + filename
 
-    if (filepath.Dir(filename) != props.directory) {
+    if (strings.HasPrefix(filepath.Dir(filename), props.directory) == false) {
         return generateError(404)
     }
 

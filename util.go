@@ -1,3 +1,6 @@
+// Author: Hathibelagal
+// Miscellaneous functions needed by the server
+
 package main
 
 import (
@@ -18,9 +21,12 @@ func createLogger(){
 
 // getContentType generates the Content-type header based on
 // the extension of the file
-func getContentType(filename string) string {    
+func getContentType(filename string) string {
     parts := strings.Split(filename, ".")
     extension := parts[len(parts)-1]
+    extension = strings.Split(extension, "?")[0]
+    extension = strings.Split(extension, "#")[0]
+    logger.Println(filename)
     return "Content-type: " + mime.TypeByExtension("." + extension)
 }
 
@@ -31,7 +37,7 @@ func generateSuccessHeader(filename string, bytes int) []byte {
     output = output + "Server: FMServer" + "\n"
     output = output + getContentType(filename) + "\n"
     output = output + "Content-length: " + strconv.Itoa(bytes) + "\n"
-    output = output + "\n\n"
+    output = output + "\n"
     return []byte(output)
 }
 
