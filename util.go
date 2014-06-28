@@ -20,13 +20,14 @@ func createLogger(){
 }
 
 // getContentType generates the Content-type header based on
-// the extension of the file
+// the extension of the file.
 func getContentType(filename string) string {
     parts := strings.Split(filename, ".")
     extension := parts[len(parts)-1]
+
+    //Remove query strings and fragment identifiers
     extension = strings.Split(extension, "?")[0]
     extension = strings.Split(extension, "#")[0]
-    logger.Println(filename)
     return "Content-type: " + mime.TypeByExtension("." + extension)
 }
 
