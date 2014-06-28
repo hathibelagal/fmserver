@@ -44,7 +44,7 @@ func handleSIGINT(listener net.Listener) {
         listener.Close()
         logger.Println("Aborted requests : " + strconv.Itoa(props.openConnections))
         logger.Println("Total requests served: " + strconv.Itoa(props.totalConnections))
-        logger.Println("Erroneous requests : " + strconv.Itoa(props.errors))
+        logger.Println("Invalid requests : " + strconv.Itoa(props.errors))
         logger.Println("Bye")
         os.Exit(0)
     }()
