@@ -11,6 +11,7 @@ import (
     "io/ioutil"
     "time"
     "path/filepath"
+    "net/url"
 )
 
 type ServerProperties struct{
@@ -64,7 +65,6 @@ func handleConnections(listener net.Listener) {
                     logger.Println("Response timed out.")
                     timedOut = true
                     connection.Write(generateError(503))
-                    return
             }
         }()
     }
@@ -75,15 +75,16 @@ func handleConnections(listener net.Listener) {
 // It returns valid HTTP responses otherwise
 func serve(request string) []byte {
     parts := strings.Fields(request)
-
     // We need atleast two words to understand the request, and the first
     // word should be GET, as we are handling only the GET verb
     if (len(parts) < 2 || parts[0] != "GET") {
         return nil
     }
 
-    // The second word is the filename
-    filename := parts[1]
+    // The second word is the filename. The filename could have spaces, and 
+    // they show up as %20. So, unescaping those and other such characters.
+    filename, _ := url.QueryUnescape(parts[1])
+    logger.Println(filename)
 
     // If it is a root request, try to server index.html
     if (strings.HasSuffix(filename, "/")) {
@@ -107,11 +108,21 @@ func serve(request string) []byte {
 // answer reads the request made by the client and passes it
 // on to serve(), to generate a response
 func answer(connection net.Conn, responseComplete chan<- bool, timedOut *bool) {
-    buffer := make([]byte, 4096) 
-    bytesRead, err := connection.Read(buffer)
+    buffer := make([]byte, 4096)
+    
+    // This deadline is being set to handle empty requests from Google Chrome
+    connection.SetReadDeadline(time.Now().Add(time.Second))
+
+    bytesRead, err := connection.Read(buffer)    
+
+    defer func() {
+        responseComplete <- true
+    }()
+
     if err != nil {
-        logger.Print(err)
+        return
     }
+
     request := string(buffer[:bytesRead])
     response := serve(request)
     props.totalConnections += 1
@@ -124,9 +135,7 @@ func answer(connection net.Conn, responseComplete chan<- bool, timedOut *bool) {
     if (response == nil){
         logger.Print("Invalid request. Ignoring")
         props.errors += 1
-        responseComplete <- true
         return
     }
     connection.Write(response)
-    responseComplete <- true
 }
