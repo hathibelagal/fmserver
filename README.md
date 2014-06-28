@@ -9,3 +9,11 @@ To serve the contents of a directory, go to that directory, and just type
 `fmserver 8080`
 
 Of course, you can change 8080 to any port you want. **Make sure fmserver is in your PATH before you do this**
+
+To download it to your machine, perform the following steps:
+
+- Install **go** on your machine
+- Create a new directory
+- `export` GOPATH to point to the directory you just created
+- `cd` to the directory
+- `go get github.com/hathibelagal/fmserver`
