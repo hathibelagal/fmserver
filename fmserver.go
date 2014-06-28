@@ -84,7 +84,6 @@ func serve(request string) []byte {
     // The second word is the filename. The filename could have spaces, and 
     // they show up as %20. So, unescaping those and other such characters.
     filename, _ := url.QueryUnescape(parts[1])
-    logger.Println(filename)
 
     // If it is a root request, try to server index.html
     if (strings.HasSuffix(filename, "/")) {
